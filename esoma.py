@@ -1,12 +1,27 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
-import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium import webdriver
+from bs4 import BeautifulSoup
 import configparser
+import time
+import pandas as pd 
+
+# Create a ConfigParser object
+configDriver = configparser.ConfigParser()
+
+# Read the configuration from the file
+configDriver.read('config.properties')
+
+# Get the value of the "driver_path" key
+driver_path = configDriver['DEFAULT']['driver_path']
+
+# LOG IN 
 
 # create a new instance of the Chrome driver
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(options=options,executable_path=driver_path)
+# if environment path variable driver = webdriver.Chrome()
 
 # create a new instance of the ConfigParser class
 config = configparser.ConfigParser()
@@ -42,6 +57,34 @@ soup = BeautifulSoup(html_content, "html.parser")
 
 # extract the relevant data from the HTML code using BeautifulSoup
 # ...
+
+## SEARCH THE VARIANTS
+
+df = pd.read_excel("D:\DOTTORATO\projects\ProgettoEsomaRepo\esoma\data\920-22 + Merge.xlsx")
+# search for the bar
+driver.get("https://franklin.genoox.com/")
+barraRicerca = driver.find_element(By.CLASS_NAME, "ng-pristine")
+
+# run over variants
+classification_list = list()
+for item in df['Merge'].values[:10]: 
+    
+    barraRicerca.send_keys(item)
+    barraRicerca.send_keys(Keys.ENTER)
+    
+    time.sleep(5)
+    # identify the element of the classification of the mutation
+    categoriaMutazione = driver.find_element(By.CLASS_NAME, "indicator-text")
+    classification_list.append(categoriaMutazione.text)
+    # search the next variant - we have to find a different element to do the search in the already searched page
+    barraRicerca = driver.find_element(By.CLASS_NAME, "search-input")
+    # clear the content of the bar
+    barraRicerca.clear()
+    
+    
+print(classification_list)
+
+###
 
 # close the browser window
 driver.quit()

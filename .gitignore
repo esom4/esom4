@@ -130,5 +130,12 @@ dmypy.json
 
 # Credentials
 /keystore.properties
+# Local Path Driver
+/config.properties
 
+# Data
 /data
+
+# Tools
+/additionalMaterial.txt
+/readFile-searchBar.ipynb
