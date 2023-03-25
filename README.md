@@ -18,9 +18,9 @@ Replace `<your_username>` and `<your_password>` with your login credentials for 
 ## How to use
 1. Navigate to the project directory in your terminal.
 2. Activate your virtual environment (optional).
-3. Run the script `genetic_scraper.py` with the path to your input file as an argument:sh
+3. Run the script `esoma.py` with the path to your input file as an argument:sh
 ```sh
-python genetic_scraper.py -i /path/to/your/input/file.txt
+python esoma.py -i /path/to/your/input/file.txt
 ```
 4. The script will output a CSV file containing the results of the search, including the gene name, mutation type, and location.
 ## Supported databases
