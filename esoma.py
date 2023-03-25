@@ -8,20 +8,19 @@ import configparser
 import time
 import pandas as pd 
 
-# Create a ConfigParser object
-configDriver = configparser.ConfigParser()
-
-# Read the configuration from the file
-configDriver.read('config.properties')
-
-# Get the value of the "driver_path" key
-driver_path = configDriver['DEFAULT']['driver_path']
-
-# LOG IN 
-
 # create a new instance of the Chrome driver
-driver = webdriver.Chrome(options=options,executable_path=driver_path)
-# if environment path variable driver = webdriver.Chrome()
+try: # try with environment variable
+    driver = webdriver.Chrome()
+except: # otherwise use the local path 
+    # Create a ConfigParser object
+    configDriver = configparser.ConfigParser()
+
+    # Read the configuration from the file
+    configDriver.read('config.properties')
+
+    # Get the value of the "driver_path" key
+    driver_path = configDriver['DEFAULT']['driver_path']
+    driver = webdriver.Chrome(executable_path=driver_path)
 
 # create a new instance of the ConfigParser class
 config = configparser.ConfigParser()
