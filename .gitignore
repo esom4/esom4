@@ -140,3 +140,6 @@ dmypy.json
 # Tools
 /additionalMaterial.txt
 /readFile-searchBar.ipynb
+
+# macOS
+.DS_Store
