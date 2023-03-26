@@ -1,7 +1,7 @@
-# Esoma
-Esoma is a Python project that scrapes public genetic databases to find genetic mutations from an input file. This project can be used for academic research or clinical applications.
+# Esom4
+Esom4 is a tool that scrapes public genetic databases to find genetic mutations from an input file. This project can be used for academic research or clinical applications.
 ## Prerequisites
-Before using Esoma, you will need to do the following:
+Before using Esom4, you will need to do the following:
 1. Clone the repository to your local machine.
 2. Install Python 3.x and the following packages:
 - requests
@@ -9,7 +9,7 @@ Before using Esoma, you will need to do the following:
 - pandas
 - selenium
 - openpyxl
-3. Install the Chrome driver. You can download it from here.
+3. Install the Chrome driver. You can download it from [here](https://sites.google.com/chromium.org/driver/).
 4. Create a keystore.properties file with the following properties:makefile
 ```makefile
 USERNAME=<your_username>
