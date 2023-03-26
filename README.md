@@ -8,6 +8,7 @@ Before using Esoma, you will need to do the following:
 - beautifulsoup4
 - pandas
 - selenium
+- openpyxl
 3. Install the Chrome driver. You can download it from here.
 4. Create a keystore.properties file with the following properties:makefile
 ```makefile
