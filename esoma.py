@@ -6,27 +6,24 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import configparser
 import time
-import pandas as pd 
-
-# create a new instance of the Chrome driver
-try: # try with environment variable
-    driver = webdriver.Chrome()
-except: # otherwise use the local path 
-    # Create a ConfigParser object
-    configDriver = configparser.ConfigParser()
-
-    # Read the configuration from the file
-    configDriver.read('config.properties')
-
-    # Get the value of the "driver_path" key
-    driver_path = configDriver['DEFAULT']['driver_path']
-    driver = webdriver.Chrome(executable_path=driver_path)
+import pandas as pd
 
 # create a new instance of the ConfigParser class
 config = configparser.ConfigParser()
 
 # read the contents of the keystore.properties file
-config.read('keystore.properties')
+config.read('config.properties')
+
+# Get the value of the source file path
+source_file_path = config['DEFAULT']['source_file_path']
+
+# create a new instance of the Chrome driver
+try: # try with environment variable
+    driver = webdriver.Chrome()
+except: # otherwise use the local path
+    # Get the value of the "driver_path" key
+    driver_path = config['DEFAULT']['driver_path']
+    driver = webdriver.Chrome(executable_path=driver_path)
 
 # navigate to the login page
 driver.get("https://franklin.genoox.com/login")
@@ -59,13 +56,15 @@ soup = BeautifulSoup(html_content, "html.parser")
 
 ## SEARCH THE VARIANTS
 
-df = pd.read_excel("D:\DOTTORATO\projects\ProgettoEsomaRepo\esoma\data\920-22 + Merge.xlsx")
+df = pd.read_excel(source_file_path)
+
 # search for the bar
 driver.get("https://franklin.genoox.com/")
 barraRicerca = driver.find_element(By.CLASS_NAME, "ng-pristine")
 
 # run over variants
 classification_list = list()
+#TODO: after the test with 10 rows, remove the .values[:10] to get all the values
 for item in df['Merge'].values[:10]: 
     
     barraRicerca.send_keys(item)
