@@ -82,7 +82,5 @@ for item in df['Merge'].values[:10]:
     
 print(classification_list)
 
-###
-
 # close the browser window
 driver.quit()
