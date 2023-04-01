@@ -63,6 +63,36 @@ soup = BeautifulSoup(html_content, "html.parser")
 
 df = pd.read_excel(file_path)
 
+### DATASET FILTERS
+# TODO: insert missing filters 
+def checkFrequency1000GAll(x, thr:float) -> bool:
+    '''
+    Function that saves all and only the values that are below the desired threshold, that are nans and that are '.'
+    '''
+    import math
+    
+    if (type(x)==float):
+        if not math.isnan(x):
+            if (x < thr):
+                return True
+            else: 
+                return False
+        
+    if type(x)==str:
+        return True
+    
+    if math.isnan(x):
+        return True
+    
+# generate the column of true values for the values to be filtered
+df['filtro1000G'] = df['1000G_ALL'].apply(lambda x: checkFrequency1000GAll(x,0.02))
+# update dataframe
+df=df[df['filtro1000G']==True]
+# drop undesired column
+df.drop('filtro1000G',axis=1,inplace=True)
+# remove 'HLA' and 'MUC' genes 
+df = df[~df['Gene.refGene'].str.startswith(('HLA', 'MUC'))]
+
 # search for the bar
 driver.get("https://franklin.genoox.com/")
 barraRicerca = driver.find_element(By.CLASS_NAME, "ng-pristine")
