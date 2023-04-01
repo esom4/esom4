@@ -9,6 +9,26 @@ import time
 import pandas as pd
 import os
 
+
+def checkFrequency1000GAll(x, thr: float) -> bool:
+    '''
+    Function that saves all and only the values that are below the desired threshold, that are nans and that are '.'
+    '''
+    import math
+
+    if (type(x) == float):
+        if not math.isnan(x):
+            if (x < thr):
+                return True
+            else:
+                return False
+
+    if type(x) == str:
+        return True
+
+    if math.isnan(x):
+        return True
+
 # create a new instance of the ConfigParser class
 config = configparser.ConfigParser()
 
@@ -64,26 +84,9 @@ soup = BeautifulSoup(html_content, "html.parser")
 df = pd.read_excel(file_path)
 
 ### DATASET FILTERS
-# TODO: insert missing filters 
-def checkFrequency1000GAll(x, thr:float) -> bool:
-    '''
-    Function that saves all and only the values that are below the desired threshold, that are nans and that are '.'
-    '''
-    import math
-    
-    if (type(x)==float):
-        if not math.isnan(x):
-            if (x < thr):
-                return True
-            else: 
-                return False
-        
-    if type(x)==str:
-        return True
-    
-    if math.isnan(x):
-        return True
-    
+
+df = df.loc[df['Func.refGene'].isin(['exonic', 'exonic;splicing', 'splicing'])]
+df = df.loc[~ df['ExonicFunc.refGene'].isin(['synonymous SNV', 'unknown'])]
 # generate the column of true values for the values to be filtered
 df['filtro1000G'] = df['1000G_ALL'].apply(lambda x: checkFrequency1000GAll(x,0.02))
 # update dataframe
