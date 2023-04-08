@@ -110,13 +110,25 @@ for item in df['Merge'].values[:10]:
     
     time.sleep(5)
     # identify the element of the classification of the mutation
-    categoriaMutazione = driver.find_element(By.CLASS_NAME, "indicator-text")
+    try:
+        categoriaMutazione = driver.find_element(By.CLASS_NAME, "indicator-text")
+    except:
+        time.sleep(10)
+        categoriaMutazione = driver.find_element(By.CLASS_NAME, "indicator-text")
+
     classification_list.append(categoriaMutazione.text)
     # search the next variant - we have to find a different element to do the search in the already searched page
     barraRicerca = driver.find_element(By.CLASS_NAME, "search-input")
     # clear the content of the bar
     barraRicerca.clear()
-    
+
+    # save the output filtered dataframe
+    df_out = df[0:len(classification_list)]
+    df_out['Franklin Classification'] = classification_list
+    # extract raw file name 
+    rawName = file_path.split('\\')[-1]
+    inputFileName = rawName.split('.')[0]
+    df_out.to_excel(os.path.join('output', inputFileName+'_results.xlsx'))
     
 print(classification_list)
 
