@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from tqdm import tqdm
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from bs4 import BeautifulSoup
@@ -8,6 +9,10 @@ import configparser
 import time
 import pandas as pd
 import os
+
+STRING_RESULT = '_results'
+EXCEL_FILE_EXTENSION = '.xlsx'
+FRANKLIN_CLASSIFICATION = 'Franklin Classification'
 
 
 def checkFrequency1000GAll(x, thr: float) -> bool:
@@ -96,14 +101,32 @@ df.drop('filtro1000G',axis=1,inplace=True)
 # remove 'HLA' and 'MUC' genes 
 df = df[~df['Gene.refGene'].str.startswith(('HLA', 'MUC'))]
 
+
+# extract raw file name fo the  input file
+rawName = file_path.split('\\')[-1]
+inputFileName = rawName.split('.')[0]
+output_filename = os.path.join('output', inputFileName + STRING_RESULT + EXCEL_FILE_EXTENSION)
+
+'''
+if output file already exists, get the number of already written rows
+and remove them from the filtered dataframe received from the input file 
+'''
+df_out_start = None
+if os.path.exists(output_filename):
+    df_out_start = pd.read_excel(output_filename)
+    rows_loaded_before = len(df_out_start.index)
+    df = df.tail(-rows_loaded_before)
+    print('The first ' + str(rows_loaded_before) + ' rows were already inserted.')
+else:
+    rows_loaded_before = 0
+
 # search for the bar
 driver.get("https://franklin.genoox.com/")
 barraRicerca = driver.find_element(By.CLASS_NAME, "ng-pristine")
 
 # run over variants
 classification_list = list()
-# TODO: after the test with 10 rows, remove the .values[:10] to get all the values
-for item in df['Merge'].values[:10]: 
+for item in tqdm(df['Merge']):
     
     barraRicerca.send_keys(item)
     barraRicerca.send_keys(Keys.ENTER)
@@ -124,11 +147,17 @@ for item in df['Merge'].values[:10]:
 
     # save the output filtered dataframe
     df_out = df[0:len(classification_list)]
-    df_out['Franklin Classification'] = classification_list
-    # extract raw file name 
-    rawName = file_path.split('\\')[-1]
-    inputFileName = rawName.split('.')[0]
-    df_out.to_excel(os.path.join('output', inputFileName+'_results.xlsx'))
+    df_out[FRANKLIN_CLASSIFICATION] = classification_list
+
+    '''
+    if the output file already contained something, adds that on top (otherwise the previous lines would be overwritten)
+    '''
+    if df_out_start is not None:
+        df_out.append(df_out_start)
+        df_out = pd.concat([df_out_start, df_out])
+
+    df_out.to_excel(output_filename, index=False)
+
     
 print(classification_list)
 

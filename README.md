@@ -9,6 +9,7 @@ Before using Esom4, you will need to do the following:
 - pandas
 - selenium
 - openpyxl
+- tqdm
 3. Install the Chrome driver. You can download it from [here](https://sites.google.com/chromium.org/driver/).
 4. Create a keystore.properties file with the following properties:makefile
 ```makefile
