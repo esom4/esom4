@@ -17,13 +17,13 @@ FRANKLIN_CLASSIFICATION = 'Franklin Classification'
 
 def checkFrequency1000GAll(x, thr: float) -> bool:
     '''
-    Function that saves all and only the values that are below the desired threshold, that are nans and that are '.'
+    Function that saves all and only the values that are not greater than the desired threshold, that are nans and that are '.'
     '''
     import math
 
     if (type(x) == float):
         if not math.isnan(x):
-            if (x < thr):
+            if (x <= thr):
                 return True
             else:
                 return False
