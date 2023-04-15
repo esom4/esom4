@@ -1,6 +1,11 @@
+import install_dependencies
+# list of required packages
+packages = ['requests','beautifulsoup4','pandas','selenium','openpyxl','tqdm']
+
+# install missing packages
+install_dependencies.install_missing_packages(packages)
+
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from tqdm import tqdm
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
