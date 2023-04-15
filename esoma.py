@@ -131,6 +131,8 @@ barraRicerca = driver.find_element(By.CLASS_NAME, "ng-pristine")
 
 # run over variants
 classification_list = list()
+scaleLen = 605 # scale length in pixels for VUS classification
+tol = 10
 for item in tqdm(df['Merge']):
     
     barraRicerca.send_keys(item)
@@ -144,7 +146,36 @@ for item in tqdm(df['Merge']):
         time.sleep(10)
         categoriaMutazione = driver.find_element(By.CLASS_NAME, "indicator-text")
 
-    classification_list.append(categoriaMutazione.text)
+    # sub-classification of VUS
+    if categoriaMutazione.text == "VUS":
+            try:
+                arrow = driver.find_element(By.CSS_SELECTOR, "polyline[fill='#18244a'][stroke='#d5d7db'][stroke-width='1']")
+            except:
+                time.sleep(10)
+                arrow = driver.find_element(By.CSS_SELECTOR, "polyline[fill='#18244a'][stroke='#d5d7db'][stroke-width='1']")
+
+            xPosition = arrow.location['x'] # arrow position 
+            scalePosition = driver.find_element(By.CLASS_NAME,"scale").location['x']
+            
+            # print('scala:'+str(scalePosition))
+            # print('arrow:'+str(xPosition))
+            # print(categoriaMutazione.text)
+            # print(item)
+            
+            if xPosition > (scalePosition + scaleLen/2)+tol:
+                classification = 'VUS-pathogenic'
+            elif (xPosition >= (scalePosition + scaleLen/2)-tol) and (xPosition <= (scalePosition + scaleLen/2)+tol): 
+                classification = 'VUS-pure'
+            elif xPosition < (scalePosition + scaleLen/2)-tol:              
+                classification = 'VUS-bening'
+            # print(classification)
+    
+    else: # not VUS 
+        classification = categoriaMutazione.text
+
+
+    classification_list.append(classification)
+
     # search the next variant - we have to find a different element to do the search in the already searched page
     barraRicerca = driver.find_element(By.CLASS_NAME, "search-input")
     # clear the content of the bar
