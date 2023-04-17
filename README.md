@@ -3,7 +3,7 @@ Esom4 is a tool that scrapes public genetic databases to find genetic mutations 
 ## Prerequisites
 Before using Esom4, you will need to do the following:
 1. Clone the repository to your local machine.
-2. Install Python 3.x and the following packages:
+2. Install Python 3.x and the following packages (the script will prompt to install the missing ones):
 - requests
 - beautifulsoup4
 - pandas
