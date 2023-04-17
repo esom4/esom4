@@ -127,7 +127,7 @@ else:
 
 # search for the bar
 driver.get("https://franklin.genoox.com/")
-barraRicerca = driver.find_element(By.CLASS_NAME, "ng-pristine")
+searchBar = driver.find_element(By.CLASS_NAME, "ng-pristine")
 
 # run over variants
 classification_list = list()
@@ -135,19 +135,19 @@ scaleLen = 605 # scale length in pixels for VUS classification
 tol = 10
 for item in tqdm(df['Merge']):
     
-    barraRicerca.send_keys(item)
-    barraRicerca.send_keys(Keys.ENTER)
+    searchBar.send_keys(item)
+    searchBar.send_keys(Keys.ENTER)
     
     time.sleep(5)
     # identify the element of the classification of the mutation
     try:
-        categoriaMutazione = driver.find_element(By.CLASS_NAME, "indicator-text")
+        mutationCategory = driver.find_element(By.CLASS_NAME, "indicator-text")
     except:
         time.sleep(10)
-        categoriaMutazione = driver.find_element(By.CLASS_NAME, "indicator-text")
+        mutationCategory = driver.find_element(By.CLASS_NAME, "indicator-text")
 
     # sub-classification of VUS
-    if categoriaMutazione.text == "VUS":
+    if mutationCategory.text == "VUS":
             try:
                 arrow = driver.find_element(By.CSS_SELECTOR, "polyline[fill='#18244a'][stroke='#d5d7db'][stroke-width='1']")
             except:
@@ -159,27 +159,27 @@ for item in tqdm(df['Merge']):
             
             # print('scala:'+str(scalePosition))
             # print('arrow:'+str(xPosition))
-            # print(categoriaMutazione.text)
+            # print(mutationCategory.text)
             # print(item)
             
             if xPosition > (scalePosition + scaleLen/2)+tol:
-                classification = 'VUS-pathogenic'
+                classification = 'VUS*'
             elif (xPosition >= (scalePosition + scaleLen/2)-tol) and (xPosition <= (scalePosition + scaleLen/2)+tol): 
-                classification = 'VUS-pure'
+                classification = 'VUS'
             elif xPosition < (scalePosition + scaleLen/2)-tol:              
-                classification = 'VUS-bening'
+                classification = 'VUS-LB'
             # print(classification)
     
     else: # not VUS 
-        classification = categoriaMutazione.text
+        classification = mutationCategory.text
 
 
     classification_list.append(classification)
 
     # search the next variant - we have to find a different element to do the search in the already searched page
-    barraRicerca = driver.find_element(By.CLASS_NAME, "search-input")
+    searchBar = driver.find_element(By.CLASS_NAME, "search-input")
     # clear the content of the bar
-    barraRicerca.clear()
+    searchBar.clear()
 
     # save the output filtered dataframe
     df_out = df[0:len(classification_list)]
