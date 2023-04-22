@@ -1,9 +1,9 @@
-import install_dependencies
+from utils.install_dependencies import install_missing_packages
 # list of required packages
-packages = ['requests','beautifulsoup4','pandas','selenium','openpyxl','tqdm']
+packages = ['requests', 'beautifulsoup4', 'pandas', 'selenium', 'openpyxl', 'tqdm']
 
 # install missing packages
-install_dependencies.install_missing_packages(packages)
+install_missing_packages(packages)
 
 from selenium.webdriver.common.by import By
 from tqdm import tqdm
