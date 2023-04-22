@@ -11,8 +11,8 @@ Before using Esom4, you will need to do the following:
 - openpyxl
 - tqdm
 3. Install the Chrome driver. You can download it from [here](https://sites.google.com/chromium.org/driver/).
-4. To use Franklin genoox database create a config.properties file with the following properties:makefile
-```makefile
+4. To use Franklin genoox database create a config.properties file with the following properties
+```
 [FRANKLIN]
 USERNAME=<your_username>
 PASSWORD=<your_password>
