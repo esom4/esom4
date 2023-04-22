@@ -11,8 +11,9 @@ Before using Esom4, you will need to do the following:
 - openpyxl
 - tqdm
 3. Install the Chrome driver. You can download it from [here](https://sites.google.com/chromium.org/driver/).
-4. Create a keystore.properties file with the following properties:makefile
+4. To use Franklin genoox database create a config.properties file with the following properties:makefile
 ```makefile
+[FRANKLIN]
 USERNAME=<your_username>
 PASSWORD=<your_password>
 ```
@@ -29,8 +30,10 @@ python esoma.py -i /path/to/your/input/file.txt
 Esoma currently supports the following public genetic databases:
 - [Franklin by genoox](https://franklin.genoox.com/clinical-db/home)
 - [Omim](https://www.omim.org/)
+
 ## Contributing
 Contributions to Esoma are welcome! If you would like to contribute, please submit a pull request with your changes.
+
 ## License
 
 ```
