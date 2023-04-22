@@ -28,6 +28,7 @@ python esoma.py -i /path/to/your/input/file.txt
 ## Supported databases
 Esoma currently supports the following public genetic databases:
 - [Franklin by genoox](https://franklin.genoox.com/clinical-db/home)
+- [Omim](https://www.omim.org/)
 ## Contributing
 Contributions to Esoma are welcome! If you would like to contribute, please submit a pull request with your changes.
 ## License
