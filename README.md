@@ -1,7 +1,7 @@
 # Esom4
 Esom4 is a tool that scrapes public genetic databases to find genetic mutations from an input file. This project can be used for academic research or clinical applications.
 
-DISCLAIMER: This tool is developed for non-profit purposes only. Our goal is to help researchers and students in providing efficient and fast analysis exploiting open-source web-based information.
+DISCLAIMER: This tool is developed for non-profit purposes only. Our goal is to help researchers and students in providing efficient and fast analysis of clinical data, exploiting open-source web-based information. Any interaction with the web-sites of the clinical databases (e.g. (https://franklin.genoox.com/clinical-db/home),(https://www.omim.org/)), must fulfill the TOS of the corresponding website. We are not responsible for any inappropriate usage of the Esom4 software.
 
 ## Prerequisites
 Before using Esom4, you will need to do the following:
