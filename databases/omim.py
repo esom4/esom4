@@ -1,5 +1,9 @@
-gene = 'AGRN'
+# work in progress
+
+import pandas as pd
+file_path = os.path.join(cwd, config_path)
 df = pd.read_excel(file_path)
+
 def OMIMquery(gene):
     '''
     OMIM query
@@ -21,6 +25,7 @@ def OMIMquery(gene):
     configDriver.read('config.properties')
 
     # Get the value of the "driver_path" key
+    driver_path = 'D:\DOTTORATO\projects\ProgettoEsoma\chromedriver_win32\chromedriver.exe'
 
     # create a new instance of the Chrome driver
     driver = webdriver.Chrome(executable_path=driver_path)
@@ -37,18 +42,34 @@ def OMIMquery(gene):
     searchBar = driver.find_element(By.CLASS_NAME,"form-control")
     
     # iterate over genes 
-    for item in tqdm(df['Gene.refGene'].unique()):
+    for gene in tqdm(df['Gene.refGene'].unique()):
     
-        searchBar.send_keys(item)
+        searchBar.send_keys(gene)
         searchBar.send_keys(Keys.ENTER)
-        # search-bar
-        searchBar = driver.find_element(By.CLASS_NAME,"form-control")
-        searchBar.clear()
+        
+        # Find the first search result link
+        try:
+            link = driver.find_element(By.PARTIAL_LINK_TEXT, gene)
+            link.click()
+        except:
+            time.sleep(10)
+            print('catch..')
+            link = driver.find_element(By.PARTIAL_LINK_TEXT, gene)
+            link.click()
+
+        time.sleep(5) # load the page 
+        tableOMIM = driver.find_element(By.CLASS_NAME, 'table')
+        rawTable = tableOMIM.text.split(' ')
+        break 
+    return rawTable        
+#         # search-bar - comment, but working!
+#         searchBar = driver.find_element(By.CLASS_NAME,"form-control")
+#         searchBar.clear()
     
     
     # wait for the page to load after login
     time.sleep(100)
     
     
-OMIMquery(gene)
+rawTable = OMIMquery(gene)
     
