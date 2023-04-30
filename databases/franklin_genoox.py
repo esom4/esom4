@@ -10,6 +10,7 @@ from tqdm import tqdm
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from bs4 import BeautifulSoup
+from pathlib import Path
 import configparser
 import time
 import pandas as pd
@@ -39,18 +40,21 @@ def checkFrequency1000GAll(x, thr: float) -> bool:
     if math.isnan(x):
         return True
 
+
+# Get the project root directory to use relative paths in properties file
+cwd = os.getcwd()  # get the current working directory
+root = Path(cwd).parent.absolute()  # get the previous directory (the root directory of the project)
+
 # create a new instance of the ConfigParser class
 config = configparser.ConfigParser()
 
 # read the contents of the keystore.properties file
-config.read('config.properties')
+config.read(os.path.join(root, 'config.properties'))
 
-# Get the current working directory to use relative paths in properties file
-cwd = os.getcwd()
 
 # Get the value of the source file path
 config_path = config['DEFAULT']['source_file_path']
-file_path = os.path.join(cwd, config_path)
+file_path = os.path.join(root, config_path)
 
 # create a new instance of the Chrome driver
 try: # try with environment variable
@@ -110,7 +114,7 @@ df = df[~df['Gene.refGene'].str.startswith(('HLA', 'MUC'))]
 # extract raw file name fo the  input file
 rawName = file_path.split('\\')[-1]
 inputFileName = rawName.split('.')[0]
-output_filename = os.path.join('output', inputFileName + STRING_RESULT + EXCEL_FILE_EXTENSION)
+output_filename = os.path.join(root, 'output', inputFileName + STRING_RESULT + EXCEL_FILE_EXTENSION)
 
 '''
 if output file already exists, get the number of already written rows
