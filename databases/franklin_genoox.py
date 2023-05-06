@@ -15,6 +15,7 @@ import time
 import pandas as pd
 import os
 from typing import List
+import json
 
 STRING_RESULT = '_results'
 EXCEL_FILE_EXTENSION = '.xlsx'
@@ -144,47 +145,67 @@ print('Loading file...')
 df = pd.read_excel(file_path)
 print('Completed.')
 
+# if the previous execution did not terminate, get the saved filters, ask the user to select them otherwise
+prev_filter_file = os.path.join(cwd, 'tmp_filters.json')
+
+if os.path.isfile(prev_filter_file):
+    askFilters = False
+    # get saved filters
+    with open(prev_filter_file) as json_file:
+        savedFilters = json.load(json_file)
+        selectedMutations = savedFilters['selectedMutations']
+        genesToExclude = savedFilters['genesToExclude']
+        causEffToExclude = savedFilters['causEffToExclude']
+        selectedCutOff = savedFilters['selectedCutOff']
+else:
+    askFilters = True
+
 ### DATASET FILTERS
 
 # filter 1
 print("Which mutations do you want to analyze?")
-print('Write your input as (example) 1,2,5,12 (with no space around commas)')
-optionInputMutations = df['Func.refGene'].unique()  # options to select
-printNumberedList(optionInputMutations)
-selectedMutations = getUserInputListFromNumberedList(optionInputMutations)
+if askFilters is True:
+    print('Write your input as (example) 1,2,5,12 (with no space around commas)')
+    optionInputMutations = df['Func.refGene'].unique()  # options to select
+    printNumberedList(optionInputMutations)
+    selectedMutations = getUserInputListFromNumberedList(optionInputMutations)
 printReceivedInput(selectedMutations)
 df = df.loc[df['Func.refGene'].isin(selectedMutations)]
 
 # filter 2
 print("Genes to exclude:")
-print("Write the list here(as gene1,gene2,gene3) with no space around commas")
-print("Press Enter to include all.")
-genesToExclude = getUserInputList()
+if askFilters is True:
+    print("Write the list here(as gene1,gene2,gene3) with no space around commas")
+    print("Press Enter to include all.")
+    genesToExclude = getUserInputList()
 printReceivedInput(genesToExclude)
 df = df[~df['Gene.refGene'].str.startswith(tuple(genesToExclude))]
 
 # filter 3
 print('Causative effects to exclude:')
-optionInputCausEff = df['ExonicFunc.refGene'].dropna().unique()  # options to select (removing emtpy cells from options)
-# if there are options to select, ask what to select and then apply filter, do not even ask otherwise
-if len(optionInputCausEff) > 0:
-    print("Write the list here (like 2,3,14) with no space around commas")
-    print("Press Enter to include all.")
-    printNumberedList(optionInputCausEff)
-    causEffToExclude = getUserInputListFromNumberedList(optionInputCausEff)
+if askFilters is True:
+    optionInputCausEff = df['ExonicFunc.refGene'].dropna().unique()  # options to select (removing emtpy cells from options)
+    # if there are options to select, ask what to select and then apply filter, do not even ask otherwise
+    if len(optionInputCausEff) > 0:
+        print("Write the list here (like 2,3,14) with no space around commas")
+        print("Press Enter to include all.")
+        printNumberedList(optionInputCausEff)
+        causEffToExclude = getUserInputListFromNumberedList(optionInputCausEff)
+    else:
+        causEffToExclude = []
+        print('No selectable options for this filter (considering the filters selected above).\n')
     printReceivedInput(causEffToExclude)
     df = df.loc[~ df['ExonicFunc.refGene'].isin(causEffToExclude)]
-else:
-    print('No selectable options for this filter (considering the filters selected above).\n')
 
 # filter 4
 print('Cutoff:')
-print('(example: to set cutoff to 15%, insert 0.15 or 0,15)')
-selectedCutOff = getUserInput()
-selectedCutOff = selectedCutOff.replace(',', '.')
-if not isNumber(selectedCutOff):
-    raise Exception('The cut off is not a valid number')
-selectedCutOff = float(selectedCutOff) # convert string in actual number
+if askFilters is True:
+    print('(example: to set cutoff to 15%, insert 0.15 or 0,15)')
+    selectedCutOff = getUserInput()
+    selectedCutOff = selectedCutOff.replace(',', '.')
+    if not isNumber(selectedCutOff):
+        raise Exception('The cut off is not a valid number')
+    selectedCutOff = float(selectedCutOff) # convert string in actual number
 printReceivedInput(selectedCutOff)
 # generate the column of true values for the values to be filtered
 df['filtro1000G'] = df['1000G_ALL'].apply(lambda x: checkFrequency1000GAll(x, selectedCutOff))
@@ -193,6 +214,19 @@ df=df[df['filtro1000G']==True]
 # drop undesired column
 df.drop('filtro1000G',axis=1,inplace=True)
 
+if askFilters is True:
+    # save filters (in case the execution stops and must be restarted from where it stopped)
+    filters_json = {
+        "selectedMutations": selectedMutations,
+        "genesToExclude": genesToExclude,
+        "causEffToExclude": causEffToExclude,
+        "selectedCutOff": selectedCutOff
+    }
+
+    # Serializing json
+    json_string = json.dumps(filters_json, indent=4)
+    with open(prev_filter_file, 'w') as outfile:
+        outfile.write(json_string)
 
 # extract raw file name fo the  input file
 rawName = file_path.split('\\')[-1]
@@ -283,6 +317,9 @@ for item in tqdm(df['Merge']):
 
     
 print(classification_list)
+
+# remove the temporary file that backs up the filters (in case the execution stops and must restart from where it stopped)
+os.remove(prev_filter_file)
 
 # close the browser window
 driver.quit()
