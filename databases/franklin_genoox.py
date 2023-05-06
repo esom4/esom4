@@ -214,8 +214,6 @@ df=df[df['filtro1000G']==True]
 # drop undesired column
 df.drop('filtro1000G',axis=1,inplace=True)
 
-df.to_excel('output di prova 1 - filtri dinamici.xlsx', index=False)
-
 if askFilters is True:
     # save filters (in case the execution stops and must be restarted from where it stopped)
     filters_json = {
