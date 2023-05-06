@@ -1,10 +1,4 @@
-# work in progress
-
-import pandas as pd
-file_path = os.path.join(cwd, config_path)
-df = pd.read_excel(file_path)
-
-def OMIMquery(gene):
+def OMIMquery(df):
     '''
     OMIM query
     '''
@@ -42,7 +36,8 @@ def OMIMquery(gene):
     searchBar = driver.find_element(By.CLASS_NAME,"form-control")
     
     # iterate over genes 
-    for gene in tqdm(df['Gene.refGene'].unique()):
+    link_url_list = list()
+    for gene in tqdm(df['Gene.refGene'].unique()[0:5]):
     
         searchBar.send_keys(gene)
         searchBar.send_keys(Keys.ENTER)
@@ -50,26 +45,39 @@ def OMIMquery(gene):
         # Find the first search result link
         try:
             link = driver.find_element(By.PARTIAL_LINK_TEXT, gene)
-            link.click()
+            link_url = link.get_attribute("href")
+            link_url_list.append(link_url)
+            print(link_url)
+        
         except:
             time.sleep(10)
             print('catch..')
-            link = driver.find_element(By.PARTIAL_LINK_TEXT, gene)
-            link.click()
+            print('Gene:', gene)
+            try:
+                link = driver.find_element(By.PARTIAL_LINK_TEXT, gene)
+                link_url = link.get_attribute("href")
+                link_url_list.append(link_url)
+                print(link_url)
+            except:
+                link_url_list.append('None')
+                print('Not found, go to next gene.')
+                # search-bar - comment, but working!
+                searchBar = driver.find_element(By.CLASS_NAME,"form-control")
+                searchBar.clear()  
+                continue
+                
+        # search-bar - comment, but working!
+        searchBar = driver.find_element(By.CLASS_NAME,"form-control")
+        searchBar.clear()   
+    # save output dataframe with omim links
+    df_out = df[0:len(link_url_list)]    
+    df_out['OMIM-Links'] = link_url_list 
+    df_out.to_excel('omimTest.xlsx')
 
-        time.sleep(5) # load the page 
-        tableOMIM = driver.find_element(By.CLASS_NAME, 'table')
-        rawTable = tableOMIM.text.split(' ')
-        break 
-    return rawTable        
-#         # search-bar - comment, but working!
-#         searchBar = driver.find_element(By.CLASS_NAME,"form-control")
-#         searchBar.clear()
-    
-    
-    # wait for the page to load after login
-    time.sleep(100)
-    
-    
-rawTable = OMIMquery(gene)
+import pandas as pd
+import os
+# file_path = os.path.join(cwd, config_path)
+df = pd.read_excel("D:\\DOTTORATO\\projects\\ProgettoEsomaRepo\\secondFolder\\esoma\\data\\920-22 + Merge.xlsx")
+
+OMIMquery(df)
     
