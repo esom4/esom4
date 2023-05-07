@@ -102,6 +102,12 @@ config.read(os.path.join(cwd, 'config.properties'))
 config_path = config['DEFAULT']['source_file_path']
 file_path = os.path.join(cwd, config_path)
 
+# Set the name for the output file
+# extract raw file name fo the  input file
+rawName = file_path.split('\\')[-1]
+inputFileName = rawName.split('.')[0]
+output_filename = os.path.join(cwd, 'output', inputFileName + STRING_RESULT + EXCEL_FILE_EXTENSION)
+
 # create a new instance of the Chrome driver
 try: # try with environment variable
     driver = webdriver.Chrome()
@@ -145,18 +151,37 @@ print('Loading file...')
 df = pd.read_excel(file_path)
 print('Completed.')
 
-# if the previous execution did not terminate, get the saved filters, ask the user to select them otherwise
+'''
+if the previous execution did not terminate, ask the user if they want to continue that execution, 
+if the answer is no, ask the user to select the filters for a new execution, 
+deleting the previous (incomplete) output file, if already created
+'''
 prev_filter_file = os.path.join(cwd, 'tmp_filters.json')
 
 if os.path.isfile(prev_filter_file):
-    askFilters = False
-    # get saved filters
-    with open(prev_filter_file) as json_file:
-        savedFilters = json.load(json_file)
-        selectedMutations = savedFilters['selectedMutations']
-        genesToExclude = savedFilters['genesToExclude']
-        causEffToExclude = savedFilters['causEffToExclude']
-        selectedCutOff = savedFilters['selectedCutOff']
+    print('The previous execution has been interrupted.')
+    print('Choose:')
+    print('1 - continue that execution')
+    print('2 - restart a new execution with other filters')
+    userDecision = getUserInput()
+    if userDecision == '1':
+        askFilters = False
+        # get saved filters
+        with open(prev_filter_file) as json_file:
+            savedFilters = json.load(json_file)
+            selectedMutations = savedFilters['selectedMutations']
+            genesToExclude = savedFilters['genesToExclude']
+            causEffToExclude = savedFilters['causEffToExclude']
+            selectedCutOff = savedFilters['selectedCutOff']
+    elif userDecision == '2':
+        askFilters = True
+        # remove the temporary file that backed up the filters
+        os.remove(prev_filter_file)
+        # if present, remove the temporary result file of the interrupted previous run
+        if os.path.isfile(output_filename):
+            os.remove(output_filename)
+    else:
+        raise Exception("Illegal answer. Run the software again.")
 else:
     askFilters = True
 
@@ -227,11 +252,6 @@ if askFilters is True:
     json_string = json.dumps(filters_json, indent=4)
     with open(prev_filter_file, 'w') as outfile:
         outfile.write(json_string)
-
-# extract raw file name fo the  input file
-rawName = file_path.split('\\')[-1]
-inputFileName = rawName.split('.')[0]
-output_filename = os.path.join(cwd, 'output', inputFileName + STRING_RESULT + EXCEL_FILE_EXTENSION)
 
 '''
 if output file already exists, get the number of already written rows
