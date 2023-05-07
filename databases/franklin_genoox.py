@@ -219,8 +219,8 @@ if askFilters is True:
     else:
         causEffToExclude = []
         print('No selectable options for this filter (considering the filters selected above).\n')
-    printReceivedInput(causEffToExclude)
-    df = df.loc[~ df['ExonicFunc.refGene'].isin(causEffToExclude)]
+printReceivedInput(causEffToExclude)
+df = df.loc[~ df['ExonicFunc.refGene'].isin(causEffToExclude)]
 
 # filter 4
 print('Cutoff:')
