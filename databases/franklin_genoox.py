@@ -16,6 +16,7 @@ import pandas as pd
 import os
 from typing import List
 import json
+from databases.omim import OMIMquery
 
 STRING_RESULT = '_results'
 EXCEL_FILE_EXTENSION = '.xlsx'
@@ -114,6 +115,7 @@ try: # try with environment variable
 except: # otherwise use the local path
     # Get the value of the "driver_path" key
     driver_path = config['DEFAULT']['driver_path']
+    print(driver_path)
     driver = webdriver.Chrome(executable_path=driver_path)
 
 # navigate to the login page
@@ -298,18 +300,12 @@ for item in tqdm(df['Merge']):
             xPosition = arrow.location['x'] # arrow position 
             scalePosition = driver.find_element(By.CLASS_NAME,"scale").location['x']
             
-            # print('scala:'+str(scalePosition))
-            # print('arrow:'+str(xPosition))
-            # print(mutationCategory.text)
-            # print(item)
-            
             if xPosition > (scalePosition + scaleLen/2)+tol:
                 classification = 'VUS*'
             elif (xPosition >= (scalePosition + scaleLen/2)-tol) and (xPosition <= (scalePosition + scaleLen/2)+tol): 
                 classification = 'VUS'
             elif xPosition < (scalePosition + scaleLen/2)-tol:              
                 classification = 'VUS-LB'
-            # print(classification)
     
     else: # not VUS 
         classification = mutationCategory.text
@@ -335,8 +331,9 @@ for item in tqdm(df['Merge']):
 
     df_out.to_excel(output_filename, index=False)
 
-    
-print(classification_list)
+# call OMIM after franklin execution 
+df_out_withOMIM = OMIMquery(df_out,driver)
+df_out_withOMIM.to_excel(output_filename, index=False)
 
 # remove the temporary file that backs up the filters (in case the execution stops and must restart from where it stopped)
 os.remove(prev_filter_file)

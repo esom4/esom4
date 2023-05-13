@@ -1,29 +1,12 @@
-def OMIMquery(df):
+def OMIMquery(df,driver):
     '''
     OMIM query
     '''
     from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.common.keys import Keys
-    from selenium import webdriver
-    from bs4 import BeautifulSoup
-    import configparser
     import time
-    from tqdm import tqdm
-    import pandas as pd 
-    # Create a ConfigParser object
-    configDriver = configparser.ConfigParser()
+    from tqdm import tqdm 
 
-    # Read the configuration from the file
-    configDriver.read('config.properties')
-
-    # Get the value of the "driver_path" key
-    driver_path = 'D:\DOTTORATO\projects\ProgettoEsoma\chromedriver_win32\chromedriver.exe'
-
-    # create a new instance of the Chrome driver
-    driver = webdriver.Chrome(executable_path=driver_path)
-    
     # close the cookies 
     driver.get("https://www.omim.org/")
     try:
@@ -72,12 +55,6 @@ def OMIMquery(df):
     # save output dataframe with omim links
     df_out = df[0:len(link_url_list)]    
     df_out['OMIM-Links'] = link_url_list 
-    df_out.to_excel('omimTest.xlsx')
 
-import pandas as pd
-import os
-# file_path = os.path.join(cwd, config_path)
-df = pd.read_excel("D:\\DOTTORATO\\projects\\ProgettoEsomaRepo\\secondFolder\\esoma\\data\\920-22 + Merge.xlsx")
-
-OMIMquery(df)
+    return df_out
     
