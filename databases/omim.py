@@ -20,7 +20,7 @@ def OMIMquery(df,driver):
     
     # iterate over genes 
     link_url_list = list()
-    for gene in tqdm(df['Gene.refGene'].unique()):
+    for gene in tqdm(df['Gene.refGene'].values):
     
         searchBar.send_keys(gene)
         searchBar.send_keys(Keys.ENTER)
