@@ -59,7 +59,7 @@ def getUserInputListFromNumberedList(elementList: List[str]) -> List[str]:
 
 def printNumberedList(list: List[str]) -> None:
     for i in range(0, len(list)):
-        print(str(i + 1) + "-" + list[i])
+        print(str(i + 1) + "-" + str(list[i]))
 
 
 def isNumber(string : str) -> bool:
